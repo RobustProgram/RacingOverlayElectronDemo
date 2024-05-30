@@ -1,0 +1,48 @@
+body {
+  background: black;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  margin: auto;
+  max-width: 38rem;
+  padding: 2rem;
+}
+
+.speedometer {
+  border: 2px solid white;
+  border-radius: 100%;
+
+  height: 256px;
+  width: 256px;
+
+  position: relative;
+}
+
+.speedometer .minimum {
+  color: white;
+  top: 50%;
+  transform: translate(100%, -50%);
+  position: absolute;
+}
+
+.speedometer .maximum {
+  color: white;
+  top: 50%;
+  right: 0;
+  transform: translate(-30%, -50%);
+  position: absolute;
+}
+
+.dial {
+  background: red;
+  height: 4px;
+  width: 128px;
+  transform-origin: center right;
+
+  position: absolute;
+  top: 50%;
+  transform: rotate(var(--dial-angle, 0deg));
+}
+
+#telemetry-status {
+  color: white;
+}
