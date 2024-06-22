@@ -30,14 +30,22 @@ import "./index.css";
 
 const dialElement = document.getElementById("dial");
 
-async function getTelemetry() {
+async function getTelemetry(isDescriptive: boolean) {
+  // Comment and uncomment here to run the test server or real server
+  // const mainDomain = "https://live.racerender.com";
+  const mainDomain = "http://localhost:3456";
   const response = await fetch(
-    "https://live.racerender.com/ViewData.php?ID=670847652&MapLap=3&ListLap=10&GetDescInfo=0"
+    `${mainDomain}/ViewData.php?ID=194936516&MapLap=9999993&ListLap=999999&GetDescInfo=${
+      isDescriptive ? 1 : 0
+    }`
   );
 
   const responseText = await response.text();
+
   // Hack to make this JSON compat
-  const parsedData = JSON.parse(responseText.replace("0xFF2020", '"0xFF2020"'));
+  const parsedData = JSON.parse(
+    responseText.replace(`"Color": 0xFF2020`, '"Color": "0xFF2020"')
+  );
 
   const speed = parseFloat(parsedData["Ext"][1].Value) * 1.60934;
   const angle = `${speed}deg`;
@@ -47,8 +55,12 @@ async function getTelemetry() {
 
 function startTelemetry() {
   document.getElementById("telemetry-status").innerHTML = "Telemetry started";
-  // Ping the telemetry server every 4 seconds
-  setInterval(getTelemetry, 4000);
+
+  // Perform the initial ping
+  getTelemetry(true);
+
+  // Ping the telemetry server every 1 seconds
+  setInterval(() => getTelemetry(false), 1000);
 }
 
 document.getElementById("start-telemetry").onclick = startTelemetry;
