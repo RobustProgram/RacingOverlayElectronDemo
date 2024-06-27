@@ -33,8 +33,14 @@ const speedDial = document.getElementById("speed-dial");
 const speedNum = document.getElementById("speed-num");
 const rpmDial = document.getElementById("rpm-dial");
 const rpmNum = document.getElementById("rpm-num");
+// need to update CSS too if you change this
+const update_interval = 500;
 
 const RPM_DIAL = {
+  next: 0,
+  prev: 0,
+};
+const SPEED_DIAL = {
   next: 0,
   prev: 0,
 };
@@ -52,10 +58,18 @@ function animate(timestamp: number) {
   const rpmDialCurrent = lerp(
     RPM_DIAL.prev,
     RPM_DIAL.next,
-    (timestamp - timeSinceLastUpdate) / 1000
+    (timestamp - timeSinceLastUpdate) / update_interval
+  );
+  const speedDialCurrent = lerp(
+    SPEED_DIAL.prev,
+    SPEED_DIAL.next,
+    (timestamp - timeSinceLastUpdate) / update_interval
   );
 
+  //rpmNum.innerText = window.getComputedStyle(rpmDial).getPropertyValue("rotation")
+
   rpmNum.innerText = rpmDialCurrent.toFixed(0).toString();
+  speedNum.innerText = speedDialCurrent.toFixed(0).toString();
 
   window.requestAnimationFrame(animate);
 }
@@ -93,7 +107,9 @@ async function getTelemetry(isDescriptive: boolean) {
   const speedAngle = `${speed * 1.286 - 25.71}deg`;
 
   speedDial.style.setProperty("--dial-angle", speedAngle);
-  speedNum.innerText = speed.toFixed(0).toString();
+  SPEED_DIAL.prev = SPEED_DIAL.next;
+  SPEED_DIAL.next = speed;
+  // speedNum.innerText = speed.toFixed(0).toString();
 
   updated = true;
 }
@@ -105,7 +121,7 @@ function startTelemetry() {
   getTelemetry(true);
 
   // Ping the telemetry server every 0.5 seconds
-  setInterval(() => getTelemetry(false), 1000);
+  setInterval(() => getTelemetry(false), update_interval);
 }
 
 document.getElementById("start-telemetry").onclick = startTelemetry;

@@ -148,7 +148,8 @@ let timeSpan = 0;
 // This has no mathematical basis for simulation. We are mapping the speed to a simple cos wave that is
 // shifted up by 1 and inverted on the x axis :^)
 function simulateSpeed() {
-  const engineSpeedClamp = Math.cos(Math.PI * (timeSpan / 30)) * -1 + 1;
+  // advance engine speed a little bit
+  const engineSpeedClamp = Math.cos(1 + Math.PI * (timeSpan / 30)) * -1 + 1;
   const vehicleSpeedClamp = Math.cos(Math.PI * (timeSpan / 30)) * -1 + 1;
 
   mockData.engineSpeed = engineSpeedClamp * 4000;
