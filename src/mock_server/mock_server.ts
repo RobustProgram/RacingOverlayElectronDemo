@@ -151,14 +151,14 @@ function simulateSpeed() {
   const engineSpeedClamp = Math.cos(Math.PI * (timeSpan / 30)) * -1 + 1;
   const vehicleSpeedClamp = Math.cos(Math.PI * (timeSpan / 30)) * -1 + 1;
 
-  mockData.engineSpeed = engineSpeedClamp * 3000;
-  mockData.vehicleSpeed = vehicleSpeedClamp * 60;
+  mockData.engineSpeed = engineSpeedClamp * 4000;
+  mockData.vehicleSpeed = vehicleSpeedClamp * 90;
 
   timeSpan++;
 }
 
 export function startMockServer(port: number) {
-  setInterval(simulateSpeed, 1000);
+  setInterval(simulateSpeed, 400);
 
   mockServer.listen(port, () => {
     console.log(`[INFO] Server start on port ${port}`);

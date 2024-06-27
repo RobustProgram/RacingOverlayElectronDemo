@@ -28,7 +28,11 @@
 
 import "./index.css";
 
-const dialElement = document.getElementById("dial");
+const speedDial = document.getElementById("speed-dial");
+const speedNum = document.getElementById("speed-num");
+const rpmDial = document.getElementById("rpm-dial");
+const rpmNum = document.getElementById("rpm-num");
+
 
 async function getTelemetry(isDescriptive: boolean) {
   // Comment and uncomment here to run the test server or real server
@@ -47,10 +51,18 @@ async function getTelemetry(isDescriptive: boolean) {
     responseText.replace(`"Color": 0xFF2020`, '"Color": "0xFF2020"')
   );
 
-  const speed = parseFloat(parsedData["Ext"][1].Value) * 1.60934;
-  const angle = `${speed}deg`;
+  const rpm = parseFloat(parsedData["Ext"][0].Value)/*  * 1.60934 */;
+  const rpmAngle = `${rpm*0.03-30}deg`;
 
-  dialElement.style.setProperty("--dial-angle", angle);
+  rpmDial.style.setProperty("--dial-angle", rpmAngle);
+  rpmNum.innerText = rpm.toFixed(0).toString();
+
+  // speed depends on uploader-side setting, for our case is already kph
+  const speed = parseFloat(parsedData["Ext"][1].Value)/*  * 1.60934 */;
+  const speedAngle = `${speed*1.286-25.71}deg`;
+
+  speedDial.style.setProperty("--dial-angle", speedAngle);
+  speedNum.innerText = speed.toFixed(0).toString();
 }
 
 function startTelemetry() {
@@ -59,8 +71,8 @@ function startTelemetry() {
   // Perform the initial ping
   getTelemetry(true);
 
-  // Ping the telemetry server every 1 seconds
-  setInterval(() => getTelemetry(false), 1000);
+  // Ping the telemetry server every 0.5 seconds
+  setInterval(() => getTelemetry(false), 500);
 }
 
 document.getElementById("start-telemetry").onclick = startTelemetry;

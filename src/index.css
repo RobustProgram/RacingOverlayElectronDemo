@@ -17,10 +17,29 @@ body {
   position: relative;
 }
 
+.speedometer .speed_tick {
+  display: flex;
+  gap: 1px;
+}
+
+.speedometer .tick {
+  transform-origin: bottom;
+  position: absolute;
+  background: linear-gradient(to top, transparent 90%, white 90%);
+  height: 50%;
+  width: 2px;
+  top: 0px;
+  left: 50%;
+  transform: rotate(0deg);
+}
+
 .speedometer .minimum {
   color: white;
   top: 50%;
-  transform: translate(100%, -50%);
+  left: 0;
+  transform: translate(18px, -50%);
+  transform-origin: 0% 50%;
+  transform: rotate(10deg);
   position: absolute;
 }
 
@@ -28,19 +47,28 @@ body {
   color: white;
   top: 50%;
   right: 0;
-  transform: translate(-30%, -50%);
+  transform: translate(-18px, -50%);
+  position: absolute;
+}
+
+.speedometer .numdisplay {
+  font-size: 3em;
+  color: white;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   position: absolute;
 }
 
 .dial {
   background: red;
   height: 4px;
-  width: 128px;
-  transform-origin: center right;
+  width: 60%;
+  transform-origin: 83.33% 0%;
 
   position: absolute;
   top: 50%;
-  transform: rotate(var(--dial-angle, 0deg));
+  transform: rotate(var(--dial-angle, -25.71deg));
 }
 
 #telemetry-status {
