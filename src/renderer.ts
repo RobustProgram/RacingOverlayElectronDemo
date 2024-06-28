@@ -29,47 +29,31 @@
 import { lerp } from "./math";
 import "./index.css";
 
+const speedBar = document.getElementById("speed-bar");
 const speedDial = document.getElementById("speed-dial");
 const speedNum = document.getElementById("speed-num");
+const rpmBar = document.getElementById("rpm-bar");
 const rpmDial = document.getElementById("rpm-dial");
 const rpmNum = document.getElementById("rpm-num");
 // need to update CSS too if you change this
 const update_interval = 500;
 
-const RPM_DIAL = {
-  next: 0,
-  prev: 0,
-};
-const SPEED_DIAL = {
-  next: 0,
-  prev: 0,
-};
-
-let timeSinceLastUpdate = 0;
-let updated = false;
-
 // Used to perform animations such as lerping the dial number
-function animate(timestamp: number) {
-  if (updated) {
-    timeSinceLastUpdate = timestamp;
-    updated = false;
+function animate() {
+
+  const rpmText = window.getComputedStyle(rpmBar).getPropertyValue("transform");
+  if (rpmText == "none") {
+    rpmNum.innerText = "0"
+  } else {
+    rpmNum.innerText = rpmText.split(/[(.,]/)[1];
   }
 
-  const rpmDialCurrent = lerp(
-    RPM_DIAL.prev,
-    RPM_DIAL.next,
-    (timestamp - timeSinceLastUpdate) / update_interval
-  );
-  const speedDialCurrent = lerp(
-    SPEED_DIAL.prev,
-    SPEED_DIAL.next,
-    (timestamp - timeSinceLastUpdate) / update_interval
-  );
-
-  //rpmNum.innerText = window.getComputedStyle(rpmDial).getPropertyValue("rotation")
-
-  rpmNum.innerText = rpmDialCurrent.toFixed(0).toString();
-  speedNum.innerText = speedDialCurrent.toFixed(0).toString();
+  const speedText = window.getComputedStyle(speedBar).getPropertyValue("transform");
+  if (speedText == "none") {
+    speedNum.innerText = "0"
+  } else {
+    speedNum.innerText = speedText.split(/[(.,]/)[1];
+  }
 
   window.requestAnimationFrame(animate);
 }
@@ -79,10 +63,10 @@ window.requestAnimationFrame(animate);
 
 async function getTelemetry(isDescriptive: boolean) {
   // Comment and uncomment here to run the test server or real server
-  // const mainDomain = "https://live.racerender.com";
-  const mainDomain = "http://localhost:3456";
+  const mainDomain = "https://live.racerender.com";
+  // const mainDomain = "http://localhost:3456";
   const response = await fetch(
-    `${mainDomain}/ViewData.php?ID=194936516&MapLap=9999993&ListLap=999999&GetDescInfo=${
+    `${mainDomain}/ViewData.php?ID=194936516&MapLap=9999999&ListLap=999999&GetDescInfo=${
       isDescriptive ? 1 : 0
     }`
   );
@@ -91,27 +75,31 @@ async function getTelemetry(isDescriptive: boolean) {
 
   // Hack to make this JSON compat
   const parsedData = JSON.parse(
-    responseText.replace(`"Color": 0xFF2020`, '"Color": "0xFF2020"')
+    responseText.replace(`0xFF2020`, '"0xFF2020"')
   );
+
+  // exit early if offline
+  if (parsedData["Status"] == "User Offline") {
+    console.log("Offline - no data");
+    return;
+  }
+  // or no OBD data (which we actually need)
+  if (parsedData["Ext"].length == 0) {
+    return;
+  }
 
   const rpm = parseFloat(parsedData["Ext"][0].Value); /*  * 1.60934 */
   const rpmAngle = `${rpm * 0.03 - 30}deg`;
 
   rpmDial.style.setProperty("--dial-angle", rpmAngle);
-  RPM_DIAL.prev = RPM_DIAL.next;
-  RPM_DIAL.next = rpm;
-  // rpmNum.innerText = rpm.toFixed(0).toString();
+  rpmBar.style.setProperty("--dial-bar", `${rpm}`);
 
   // speed depends on uploader-side setting, for our case is already kph
   const speed = parseFloat(parsedData["Ext"][1].Value); /*  * 1.60934 */
   const speedAngle = `${speed * 1.286 - 25.71}deg`;
 
   speedDial.style.setProperty("--dial-angle", speedAngle);
-  SPEED_DIAL.prev = SPEED_DIAL.next;
-  SPEED_DIAL.next = speed;
-  // speedNum.innerText = speed.toFixed(0).toString();
-
-  updated = true;
+  speedBar.style.setProperty("--dial-bar", `${speed}`);
 }
 
 function startTelemetry() {
